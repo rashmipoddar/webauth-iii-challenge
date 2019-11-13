@@ -28,6 +28,7 @@ router.post('/login', validateUserLogin, (req, res) => {
   const { username, password } = req.body;
   
   Users.getUserBy({ username })
+    .first()
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
         const token = createToken(user);
@@ -44,14 +45,25 @@ router.post('/login', validateUserLogin, (req, res) => {
 });
 
 router.get('/users', checkUserLoggedIn, (req, res) => {
-  Users.getUsers()
-    .then(users => {
-      res.status(200).send(users);
+  const id = req.decodedToken.id;
+
+  Users.getUserById(id) 
+    .then(user => {
+      const { department } = user;
+      Users.getUserBy({department})
+        .then(users => {
+          res.status(200).send(users);
+        })
+        .catch(err => {
+          console.log(err);
+          res.status(500).send({message: 'There was an error in getting users from the database. Try again.'});
+        })
     })
     .catch(err => {
       console.log(err);
-      res.status(500).send({message: 'There was an error in getting users from the database. Try again.'})
+      res.status(500).send({message: 'There was an error in getting users from the database. Try again.'});
     })
+  
 });
 
 

@@ -9,7 +9,7 @@ const getUserById = (id) => {
 }
 
 const getUserBy = (filter) => {
-  return db('users').where(filter).first();
+  return db('users').where(filter);
 }
 
 const addUser = (user) => {

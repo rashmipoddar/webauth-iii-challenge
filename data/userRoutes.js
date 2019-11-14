@@ -12,7 +12,7 @@ router.post('/register', validateUserData, (req, res) => {
   userData.password = hashedPassword;
 
   Users.addUser(userData)
-    .then(user =>{
+    .then(user => {
       const token = createToken(user);
       user.token = token;
       res.status(201).send(user);
@@ -33,6 +33,7 @@ router.post('/login', validateUserLogin, (req, res) => {
       if (user && bcrypt.compareSync(password, user.password)) {
         const token = createToken(user);
         user.token = token;
+        delete user.password;
         res.status(200).send(user);
       } else {
         res.status(401).send({message: 'You shall not pass.'});
